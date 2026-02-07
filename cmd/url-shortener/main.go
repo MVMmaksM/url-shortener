@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/MVMmaksM/url-shortener/cmd/internal/config"
+	"github.com/MVMmaksM/url-shortener/cmd/internal/lib/logger/sl"
+	"github.com/MVMmaksM/url-shortener/cmd/internal/storage/sqlite"
 )
 
 const (
@@ -16,8 +18,14 @@ const (
 func main() {
 	cfg := config.MustLoad()
 	log := setupLogger(cfg.Env)
-	log.Info("test")
-	log.Debug("debugger")
+
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+
+	_ = storage
 }
 
 func setupLogger(env string) *slog.Logger {
